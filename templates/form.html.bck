@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ 'Edit' if ont else 'Tambah' }} ONT</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/logo.png') }}">
+  <style>
+    /* Reset default styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* Body styling */
+    body {
+      background-color: #f5f7fa;
+      padding: 20px;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Heading styling */
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+      font-size: 2.2em;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* Form container */
+    form {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* Form labels */
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #2c3e50;
+    }
+
+    /* Form inputs */
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+      background-size: 16px 16px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+    }
+
+    /* Submit button */
+    button[type="submit"] {
+      background-color: #3498db;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #2980b9;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      form {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      input, select, button[type="submit"] {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>{{ 'Edit' if ont else 'Tambah' }} ONT</h1>
+  <form method="post">
+    <label for="id_pelanggan">ID Pelanggan:</label>
+    <input type="text" name="id_pelanggan" id="id_pelanggan" value="{{ ont.id_pelanggan or '' }}" required>
+
+    <label for="name">Nama:</label>
+    <input type="text" name="name" id="name" value="{{ ont.name or '' }}" required>
+
+    <label for="lokasi">Lokasi:</label>
+    <input type="text" name="lokasi" id="lokasi" value="{{ ont.lokasi or '' }}" required>
+
+    <label for="ip">IP:</label>
+    <input type="text" name="ip" id="ip" value="{{ ont.ip or '' }}" required>
+
+    <label for="latitude">Latitude:</label>
+    <input type="number" step="any" name="latitude" id="latitude" value="{{ ont.latitude or '' }}" required>
+
+    <label for="longitude">Longitude:</label>
+    <input type="number" step="any" name="longitude" id="longitude" value="{{ ont.longitude or '' }}" required>
+
+    <!-- <label for="status">Status:</label>
+    <select name="status" id="status" required>
+      <option value="ON" {% if ont.status == 'ON' %}selected{% endif %}>ON</option>
+      <option value="OFF" {% if ont.status == 'OFF' or not ont.status %}selected{% endif %}>OFF</option>
+    </select> -->
+
+    <button type="submit">Simpan</button>
+  </form>
+</body>
+</html>

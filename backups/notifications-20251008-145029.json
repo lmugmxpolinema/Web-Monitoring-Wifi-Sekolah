@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "message": "ONT diperbarui: SD BOPKRI BINTARAN (LM001127) \u2192 SD BOPKRI BINTARANn (LM001127)",
+    "type": "info",
+    "timestamp": "2025-10-08T14:39:12.869080",
+    "ont_id": 1,
+    "ont_name": "SD BOPKRI BINTARANn",
+    "read": true
+  },
+  {
+    "id": 2,
+    "message": "ONT diperbarui: SD BOPKRI BINTARANn (LM001127) \u2192 SD BOPKRI BINTARAN (LM001127)",
+    "type": "info",
+    "timestamp": "2025-10-08T14:39:28.130594",
+    "ont_id": 1,
+    "ont_name": "SD BOPKRI BINTARAN",
+    "read": true
+  },
+  {
+    "id": 3,
+    "message": "ONT diperbarui: SD BOPKRI BINTARAN (LM001127) \u2192 SD BOPKRI BINTARAN (LM001127)",
+    "type": "info",
+    "timestamp": "2025-10-08T14:41:44.450636",
+    "ont_id": 1,
+    "ont_name": "SD BOPKRI BINTARAN",
+    "read": true
+  },
+  {
+    "id": 4,
+    "message": "ONT diperbarui: SD BOPKRI BINTARAN (LM001127) \u2192 SD BOPKRI BINTARAN (LM001127)",
+    "type": "info",
+    "timestamp": "2025-10-08T14:42:44.075571",
+    "ont_id": 1,
+    "ont_name": "SD BOPKRI BINTARAN",
+    "read": true
+  },
+  {
+    "id": 5,
+    "message": "ONT diperbarui: SD BOPKRI BINTARAN (LM001127) \u2192 SD BOPKRI BINTARAN (LM001127)",
+    "type": "info",
+    "timestamp": "2025-10-08T14:44:40.429980",
+    "ont_id": 1,
+    "ont_name": "SD BOPKRI BINTARAN",
+    "read": true
+  },
+  {
+    "id": 6,
+    "message": "ONT baru ditambahkan: Carter Zimmerman (Et sequi velit veli)",
+    "type": "success",
+    "timestamp": "2025-10-08T14:50:29.650019",
+    "ont_id": 226,
+    "ont_name": "Carter Zimmerman",
+    "read": false
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "message": "ONT baru ditambahkan: Judah Steele (test)",
+    "type": "success",
+    "timestamp": "2025-10-13T13:37:01.989891",
+    "ont_id": 226,
+    "ont_name": "Judah Steele",
+    "read": true
+  },
+  {
+    "id": 2,
+    "message": "ONT dihapus: Judah Steele (test)",
+    "type": "warning",
+    "timestamp": "2025-10-13T13:37:15.976452",
+    "ont_id": 226,
+    "ont_name": "Judah Steele",
+    "read": true
+  },
+  {
+    "id": 3,
+    "message": "ONT diperbarui: SD MARSUDIRINI 2 (LM001769) \u2192 SD MARSUDIRINI 2 (LM001769)",
+    "type": "info",
+    "timestamp": "2025-10-14T10:01:26.093727",
+    "ont_id": 76,
+    "ont_name": "SD MARSUDIRINI 2",
+    "read": true
+  },
+  {
+    "id": 4,
+    "message": "ONT diperbarui: SD MARSUDIRINI 2 (LM001769) \u2192 SD MARSUDIRINI 2 (LM001769)",
+    "type": "info",
+    "timestamp": "2025-10-14T10:04:35.112104",
+    "ont_id": 76,
+    "ont_name": "SD MARSUDIRINI 2",
+    "read": true
+  }
+]
