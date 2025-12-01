@@ -33,9 +33,11 @@ def load_user(user_id):
         return User(user_id)
     return None
 
+# Derive storage locations from the deployment root to survive rolling releases
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / 'data'
-RUNTIME_DIR = BASE_DIR / 'runtime'
+ROOT_DIR = Path(os.environ.get("WIFISEKOLAH_ROOT", BASE_DIR.parent))
+DATA_DIR = ROOT_DIR / 'data'
+RUNTIME_DIR = ROOT_DIR / 'runtime'
 BACKUP_DIR = RUNTIME_DIR / 'backups'
 
 DATA_FILE = DATA_DIR / 'onts.json'

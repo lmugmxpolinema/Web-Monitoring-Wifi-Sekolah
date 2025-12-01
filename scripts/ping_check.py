@@ -13,8 +13,11 @@ MIKROTIK_PORT = 8728
 MIKROTIK_USER = 'monitor'
 MIKROTIK_PASS = 's0t0kudus'
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / 'data'
+# Derive storage paths from the deployment root so data survives release swaps
+BASE_DIR = Path(__file__).resolve().parent
+ROOT_DIR = Path(os.environ.get("WIFISEKOLAH_ROOT", BASE_DIR.parent))
+DATA_DIR = ROOT_DIR / 'data'
+RUNTIME_DIR = ROOT_DIR / 'runtime'
 ONTS_FILE = DATA_DIR / 'onts.json'
 
 FLASK_SERVER_URL = os.getenv('FLASK_SERVER_URL', 'http://127.0.0.1:8274')
