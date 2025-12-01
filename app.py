@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 import json
 from collections import Counter
+from pathlib import Path
 import routeros_api
 
 app = Flask(__name__)
@@ -32,22 +33,26 @@ def load_user(user_id):
         return User(user_id)
     return None
 
-DATA_FILE = 'onts.json'
-NOTIFICATIONS_FILE = 'notifications.json'
-NOTIFICATIONS_BAK_FILE = f"{NOTIFICATIONS_FILE}.bak"
-OUTAGES_FILE = 'outages.json'
-BACKUP_DIR = 'backups'
-HISTORY_FILE = 'history.json'
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / 'data'
+RUNTIME_DIR = BASE_DIR / 'runtime'
+BACKUP_DIR = RUNTIME_DIR / 'backups'
+
+DATA_FILE = DATA_DIR / 'onts.json'
+NOTIFICATIONS_FILE = DATA_DIR / 'notifications.json'
+NOTIFICATIONS_BAK_FILE = NOTIFICATIONS_FILE.with_suffix(NOTIFICATIONS_FILE.suffix + '.bak')
+OUTAGES_FILE = DATA_DIR / 'outages.json'
+HISTORY_FILE = RUNTIME_DIR / 'history.json'
 MIKROTIK_IP = '111.92.166.184'
 MIKROTIK_PORT = 8728
 MIKROTIK_USER = 'monitor'
 MIKROTIK_PASS = 's0t0kudus'
-USER_LOG_FILE = 'user_log.json'
+USER_LOG_FILE = RUNTIME_DIR / 'user_log.json'
 
 
 def load_data():
     try:
-        with open(DATA_FILE, 'r') as f:
+        with DATA_FILE.open('r', encoding='utf-8') as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return []
@@ -57,7 +62,7 @@ def load_data():
 def load_notifications():
     """Load notifications from primary file; fall back to backup on decode error."""
     try:
-        with open(NOTIFICATIONS_FILE, 'r') as f:
+        with NOTIFICATIONS_FILE.open('r', encoding='utf-8') as f:
             notifications = json.load(f)
         if not isinstance(notifications, list):
             raise ValueError("Notifications file does not contain a list")
@@ -78,7 +83,7 @@ def _recover_notifications_from_backup():
     """Mencoba memulihkan notifikasi dari backup terbaru"""
     try:
         import glob
-        backup_pattern = f'{BACKUP_DIR}/notifications-*.json'
+        backup_pattern = str(BACKUP_DIR / 'notifications-*.json')
         backup_files = glob.glob(backup_pattern)
         if not backup_files:
             print("No notification backups found, starting fresh")
@@ -86,7 +91,7 @@ def _recover_notifications_from_backup():
         backup_files.sort(key=os.path.getmtime, reverse=True)
         latest_backup = backup_files[0]
         print(f"Recovering notifications from: {latest_backup}")
-        with open(latest_backup, 'r') as f:
+        with open(latest_backup, 'r', encoding='utf-8') as f:
             notifications = json.load(f)
         save_notifications(notifications)
         print(f"Successfully recovered {len(notifications)} notifications")
@@ -96,9 +101,11 @@ def _recover_notifications_from_backup():
         return []
 
 def _atomic_write_json(file_path, data):
-    dir_name = os.path.dirname(file_path) or '.'
-    temp_path = os.path.join(dir_name, f".tmp-{os.path.basename(file_path)}")
-    with open(temp_path, 'w') as tf:
+    file_path = Path(file_path)
+    dir_name = file_path.parent
+    dir_name.mkdir(parents=True, exist_ok=True)
+    temp_path = dir_name / f".tmp-{file_path.name}"
+    with temp_path.open('w', encoding='utf-8') as tf:
         json.dump(data, tf, indent=2)
         tf.flush()
         try:
@@ -106,7 +113,8 @@ def _atomic_write_json(file_path, data):
         except Exception:
             pass
     try:
-        with open(f"{file_path}.bak", 'w') as bf:
+        backup_path = file_path.with_suffix(file_path.suffix + '.bak')
+        with backup_path.open('w', encoding='utf-8') as bf:
             json.dump(data, bf, indent=2)
     except Exception:
         pass
@@ -117,7 +125,7 @@ def save_notifications(notifications):
 
 def load_outages():
     try:
-        with open(OUTAGES_FILE, 'r') as f:
+        with OUTAGES_FILE.open('r', encoding='utf-8') as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return []
@@ -159,9 +167,9 @@ def add_notification(message, notification_type="info", ont_id=None, ont_name=No
 def _backup_notifications(notifications):
     try:
         timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-        backup_path = f'{BACKUP_DIR}/notifications-{timestamp}.json'
-        os.makedirs(BACKUP_DIR, exist_ok=True)
-        with open(backup_path, 'w') as f:
+        BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+        backup_path = BACKUP_DIR / f'notifications-{timestamp}.json'
+        with backup_path.open('w', encoding='utf-8') as f:
             json.dump(notifications, f, indent=2)
         _cleanup_old_backups('notifications-*.json', 10)
     except Exception as e:
@@ -170,23 +178,24 @@ def _backup_notifications(notifications):
 def _cleanup_old_backups(pattern, keep_count):
     try:
         import glob
-        backup_files = glob.glob(f'{BACKUP_DIR}/{pattern}')
+        backup_files = glob.glob(str(BACKUP_DIR / pattern))
         backup_files.sort(key=os.path.getmtime, reverse=True)
         for old_file in backup_files[keep_count:]:
             try:
-                os.remove(old_file)
+                Path(old_file).unlink()
             except:
                 pass
     except Exception as e:
         print(f"Warning: Failed to cleanup old backups: {e}")
 
 def save_and_backup(onts):
-    with open(DATA_FILE, 'w') as f:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with DATA_FILE.open('w', encoding='utf-8') as f:
         json.dump(onts, f, indent=2)
-    os.makedirs(BACKUP_DIR, exist_ok=True)
+    BACKUP_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-    backup_path = f'{BACKUP_DIR}/onts-{timestamp}.json'
-    with open(backup_path, 'w') as f:
+    backup_path = BACKUP_DIR / f'onts-{timestamp}.json'
+    with backup_path.open('w', encoding='utf-8') as f:
         json.dump(onts, f, indent=2)
 
 # ============ AUTHENTICATION ROUTES ============
@@ -346,7 +355,7 @@ def delete_ont(id):
 def get_history():
     """API untuk mengambil semua data riwayat dari history.json."""
     try:
-        with open(HISTORY_FILE, 'r') as f:
+        with HISTORY_FILE.open('r', encoding='utf-8') as f:
             history = json.load(f)
         return jsonify(history)
     except (FileNotFoundError, json.JSONDecodeError):
@@ -367,7 +376,7 @@ def record_history():
     }
     
     try:
-        with open(HISTORY_FILE, 'r') as f:
+        with HISTORY_FILE.open('r', encoding='utf-8') as f:
             history = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         history = []
@@ -378,17 +387,18 @@ def record_history():
     if len(history) > MAX_HISTORY:
         history = history[-MAX_HISTORY:]
 
-    with open(HISTORY_FILE, 'w') as f:
+    HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with HISTORY_FILE.open('w', encoding='utf-8') as f:
         json.dump(history, f, indent=2)
 
     return jsonify({"success": True, "recorded": new_record})
 
-ONT_HISTORY_FILE = 'ont_history.json'
+ONT_HISTORY_FILE = RUNTIME_DIR / 'ont_history.json'
 @app.route('/api/ont-history', methods=['GET'])
 def get_ont_history():
     """API untuk mengambil riwayat jumlah ONT aktif"""
     try:
-        with open(ONT_HISTORY_FILE, 'r') as f:
+        with ONT_HISTORY_FILE.open('r', encoding='utf-8') as f:
             data = json.load(f)
         return jsonify(data)
     except (FileNotFoundError, json.JSONDecodeError):
@@ -401,7 +411,7 @@ def record_ont_history():
         entry = request.get_json()
         records = []
         try:
-            with open(ONT_HISTORY_FILE, 'r') as f:
+            with ONT_HISTORY_FILE.open('r', encoding='utf-8') as f:
                 records = json.load(f)
         except Exception:
             records = []
@@ -424,7 +434,8 @@ def record_ont_history():
         if last_ts and new_ts and (new_ts - last_ts).total_seconds() < MIN_INTERVAL:
             return jsonify({'success': True, 'skipped': True}), 200
         records.append({'timestamp': entry.get('timestamp'), 'count': entry.get('count')})
-        with open(ONT_HISTORY_FILE, 'w') as f:
+        ONT_HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with ONT_HISTORY_FILE.open('w', encoding='utf-8') as f:
             json.dump(records, f, indent=2)
         return jsonify({'success': True})
     except Exception:
@@ -515,7 +526,7 @@ def log_active_users():
         "users": users_detail
     }
     try:
-        with open(USER_LOG_FILE, 'r') as f:
+        with USER_LOG_FILE.open('r', encoding='utf-8') as f:
             log_data = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         log_data = []
@@ -527,7 +538,8 @@ def log_active_users():
     if len(log_data) > MAX_LOG_ENTRIES:
         log_data = log_data[-MAX_LOG_ENTRIES:]
 
-    with open(USER_LOG_FILE, 'w') as f:
+    USER_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with USER_LOG_FILE.open('w', encoding='utf-8') as f:
         json.dump(log_data, f, indent=2)
 
     return jsonify({"success": True, "message": f"Logged {len(users_detail)} users."})
@@ -537,7 +549,7 @@ def log_active_users():
 def get_analytics_data():
     """Membaca user_log.json, memprosesnya, dan mengirimkan data untuk halaman analitik."""
     try:
-        with open(USER_LOG_FILE, 'r') as f:
+        with USER_LOG_FILE.open('r', encoding='utf-8') as f:
             log_data = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return jsonify({"error": "Belum ada data analitik."}), 404
