@@ -60,14 +60,6 @@ pipeline {
                         static \\
                         templates \\
                         reports \\
-                        data \\
-                        csvjson.json \\
-                        notifications.json \\
-                        onts.json \\
-                        outages.json \\
-                        history.json \\
-                        ont_history.json \\
-                        user_log.json \\
                         COLOR_LEGEND.md \\
                         COLOR_SYSTEM_DOCUMENTATION.md \\
                         QUICK_COLOR_REFERENCE.txt \\
