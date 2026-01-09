@@ -31,7 +31,7 @@ pipeline {
         }
 
         stage('Install & Test') {
-            agent { label 'stb' }
+            agent { label 'controller' }
             steps {
                 unstash 'source'
                 sh """
@@ -49,7 +49,7 @@ pipeline {
         }
 
         stage('Package Artifact') {
-            agent { label 'stb' }
+            agent { label 'controller' }
             steps {
                 sh """
                     set -e
